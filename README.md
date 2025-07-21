@@ -1,5 +1,5 @@
 # edgeflare
-Including some apps for serverless platform.
+Including some apps for serverless platforms.
 
 app list:
 ```
