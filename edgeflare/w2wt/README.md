@@ -7,6 +7,6 @@ headers: {
   x-forward-host
   x-forward-port
   x-forward-path
-  x-forward-protocol:["tcp" | "tls" | "ws" | "wss"]
+  x-forward-protocol: ["tcp" | "tls" | "ws" | "wss"]
 }
 ```
