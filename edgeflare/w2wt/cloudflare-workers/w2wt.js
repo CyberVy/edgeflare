@@ -90,7 +90,7 @@ async function main(request){
     if (!forwardPort){
         forwardProtocol === "wss" || forwardProtocol === "tls" ? forwardPort = 443 : forwardPort = 80
     }
-    console.log(`${request.headers.get("x-real-ip")}\n${forwardProtocol}://${forwardHost}:${forwardPort}${forwardPath}`)
+    console.log(`${request.headers.get("cf-connecting-ip")}\n${forwardProtocol}://${forwardHost}:${forwardPort}${forwardPath}`)
 
     if (forwardProtocol === "ws" || forwardProtocol === "wss"){
         forwardProtocol === "ws" ? forwardProtocol = "http" : 0
