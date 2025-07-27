@@ -22,7 +22,7 @@ export default {
         try {
             let upgradeHeader = request.headers.get('Upgrade')
             if (!upgradeHeader || upgradeHeader !== 'websocket') {
-                ctx.waitUntil(new Logger().logRemote(`[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.url}\n${request.headers.get("user-agent") || ""}\n${request.cf.httpProtocol}`))
+                ctx.waitUntil(new Logger().logRemote(`[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.url}\n${request.headers.get("user-agent") || ""}\n${request.cf.httpProtocol}`))
                 return new Response((await fetch(redirect_target)).body,{headers:{"content-type":"text/html"}})
             }
             else {
@@ -688,7 +688,7 @@ async function main(request,env,ctx){
 
     let response = await directly_relay_to_other_ws_proxy(request,LANDING_SERVERS)
     if (response){
-        logger.info = `[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
+        logger.info = `[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
         ctx.waitUntil(logger.log("\n>>>"))
         return response
     }
@@ -718,7 +718,7 @@ async function main(request,env,ctx){
             }
             // if mux is not open, get address port and RCD also, then create a new TCP socket
             if (command !== 3){
-                logger.info = `[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${address}:${port}`
+                logger.info = `[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${address}:${port}`
                 let connectAPITransformer = await transformAddressAndPortForCloudflareTCPAPI(
                     address,port,HTTPS_CF_address,HTTPS_CF_port,HTTP_CF_address,HTTP_CF_port,SNI_proxy_address,SNI_proxy_port,NAT64_Out)
                 address = connectAPITransformer.address
