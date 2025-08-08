@@ -470,6 +470,12 @@ function writeReadableStream(readableStream,writeFunction,closeFunction,abortFun
 }
 
 async function directly_relay_to_other_ws_proxy(request,proxies){
+    
+    if (request.cf.country === "CN" && ["HKG","NRT","SIN"].includes(request.cf.colo)){
+        request.protocol = "http"
+        return await fetch(request)
+    }
+    
     for (let item in proxies){
         if (item === request.cf.colo && proxies[item])
             return await fetch(proxies[item],request)
@@ -482,8 +488,10 @@ async function main(request,env,ctx){
 
     let response = await directly_relay_to_other_ws_proxy(request,LANDING_SERVERS)
     if (response){
-        logger.info = `[SHADOWSOCKS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
-        ctx.waitUntil(logger.log("\n>>>"))
+        if (LANDING_SERVERS[request.cf.colo]){
+            logger.info = `[SHADOWSOCKS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
+            ctx.waitUntil(logger.log("\n>>>"))
+        }
         return response
     }
 
