@@ -695,7 +695,7 @@ async function main(request,env,ctx){
     let response = await directly_relay_to_other_ws_proxy(request,LANDING_SERVERS)
      if (response){
         if (LANDING_SERVERS[request.cf.colo]){
-            logger.info = `[SHADOWSOCKS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
+            logger.info = `[VLESS] ${request.cf.colo} ${request.headers.get("x-forwarded-for") || request.headers.get("cf-connecting-ip")}\nAS${request.cf.asn} ${request.cf.asOrganization} ${request.cf.city || request.cf.country} ${request.cf.clientTcpRtt || 0}ms\n${request.cf.colo}: ${LANDING_SERVERS[request.cf.colo]}`
             ctx.waitUntil(logger.log("\n>>>"))
         }
         return response
