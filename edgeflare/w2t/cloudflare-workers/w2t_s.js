@@ -483,7 +483,6 @@ async function directly_relay_to_other_ws_proxy(request,proxies){
 }
 
 async function main(request,env,ctx){
-
     let {HTTPS_CF_address,HTTPS_CF_port,HTTP_CF_address,HTTP_CF_port,SNI_proxy_address,SNI_proxy_port,NAT64_Out,logger} = initializeGlobalVariableViaWebsocketPath(request)
 
     let response = await directly_relay_to_other_ws_proxy(request,LANDING_SERVERS)
