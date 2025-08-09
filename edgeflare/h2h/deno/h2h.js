@@ -3,7 +3,7 @@ Deno.serve(async (request,info) => {
     let url = new URL(request.url)
     console.log(request.url,request.method)
     try {
-        let target_url = new URL(url.pathname.slice(1))
+        let target_url = new URL(decodeURIComponent(url.pathname.slice(1)))
         target_url.search = url.search
         url.search = ""
         let _request = new Request(target_url,{
