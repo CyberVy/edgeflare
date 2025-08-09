@@ -6,7 +6,7 @@ export default {
             return Response.redirect(url.toString(),302)
         }
         try {
-            let target_url = new URL(url.pathname.slice(1))
+            let target_url = new URL(decodeURIComponent(url.pathname.slice(1)))
             target_url.search = url.search
             url.search = ""
             console.log(target_url)
