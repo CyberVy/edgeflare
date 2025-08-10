@@ -1,11 +1,20 @@
 Deno.serve(async (request,info) => {
 
     let url = new URL(request.url)
-    console.log(request.url,request.method)
+
     try {
         let target_url = new URL(decodeURIComponent(url.pathname.slice(1)))
-        target_url.search = url.search
+        
+        // add search params for the input url,
+        // if the url is decoded by decodeURIComponent, this snippet will do nothing,
+        // because the input url can not receive the search params,
+        // which is included in the decoded url.
+        if (target_url.search === "" && url.search !== ""){
+            target_url.search = url.search
+        }
         url.search = ""
+        console.log(target_url,request.method)
+        
         let _request = new Request(target_url,{
             method:request.method,
             headers:request.headers,
