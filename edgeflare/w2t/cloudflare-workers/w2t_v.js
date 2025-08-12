@@ -677,15 +677,15 @@ function streamAutoClose(stream,promise) {
 }
 
 async function directly_relay_to_other_ws_proxy(request,proxies){
-    
-    if (request.cf.country === "CN" && ["HKG","NRT","SIN"].includes(request.cf.colo)){
-        request.protocol = "http"
-        return await fetch(request)
-    }
-    
+
     for (let item in proxies){
         if (item === request.cf.colo && proxies[item])
             return await fetch(proxies[item],request)
+    }
+
+    if (!request.cf.asOrganization.toUpperCase().includes("CLOUDFLARE")){
+        request.protocol = "http"
+        return await fetch(request)
     }
 }
 
@@ -771,7 +771,7 @@ async function main(request,env,ctx){
                 if (counter === 1){
                     TCPRTT = Date.now()
                 }
-                TCPSocketWriters[0].write(chunk).catch(error => {})
+                TCPSocketWriters[0].write(chunk).catch(error => clientSocket.close())
             }
             // mux
             else {
