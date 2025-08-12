@@ -477,7 +477,6 @@ async function directly_relay_to_other_ws_proxy(request,proxies){
     }
 
     if (!request.cf.asOrganization.toUpperCase().includes("CLOUDFLARE")){
-        request.protocol = "http"
         return await fetch(request)
     }
 }
