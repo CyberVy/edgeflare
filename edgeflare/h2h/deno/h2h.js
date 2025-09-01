@@ -155,7 +155,7 @@ async function main(request,info){
     return response
 }
 
-Deno.serv(async (request,info) => {
+Deno.serve(async (request,info) => {
     try {
         return await main(request,info)
     }
