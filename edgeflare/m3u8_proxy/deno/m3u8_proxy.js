@@ -93,7 +93,7 @@ async function http_forward(request) {
             target_url.search = url.search
         }
         url.search = ""
-        console.log(target_url,request.method)
+        console.log(target_url.href,request.method)
 
         let _request = new Request(target_url,{
             method:request.method,
@@ -124,6 +124,7 @@ async function http_forward(request) {
         let response = new Response(_response.body,{status:_response.status})
         _response.headers.forEach((v,k) => response.headers.set(k,v))
         response.headers.set("Access-Control-Allow-Origin","*")
+        response.headers.delete("Content-Length")
         url.pathname = "/" // proxy url
         return response
     }
