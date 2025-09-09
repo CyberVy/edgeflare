@@ -6,4 +6,5 @@ app list:
 w2t supported platform: cloudflare
 h2h supported platform: cloudflare, deno
 w2wt supported platform: cloudflare, deno
+m3u8_proxy supported platform: cloudflare, deno
 ```

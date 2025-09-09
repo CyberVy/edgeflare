@@ -1,42 +1,45 @@
-function normalize_m3u8_playlist(m3u8_string, m3u8_origin , proxy = ""){
-    for (const item of m3u8_string.split("\n")){
-        if (item) {
-            if (!item.startsWith("https://") && !item.startsWith("http://")){
-                // non-URL
-                if (!item.startsWith("#")){
-                    if (item.startsWith("/")){
-                        m3u8_string = m3u8_string.replace(item,`${proxy}${m3u8_origin.protocol}//${m3u8_origin.host}${item}`)
-                    }
-                    else {
-                        m3u8_string = m3u8_string.replace(item,`${proxy}${m3u8_origin.protocol}//${m3u8_origin.host}${m3u8_origin.pathname.split("/").slice(0,-1).join("/")}/${item}`)
-                    }
-                }
-                else {
-                    if (item.startsWith("#EXT-X-KEY") || item.startsWith("#EXT-X-MAP")){
-                        let line = item
-                        const key_url = item.match(/URI="(.*)"/)?.[1] || ""
-                        if (!key_url.startsWith("https://") && !key_url.startsWith("http://")){
-                            if (key_url.startsWith("/")){
-                                line = item.replace(/URI="(.*)"/,(match,p1) => `URI="${proxy}${m3u8_origin.protocol}//${m3u8_origin.host}${p1}"`)
-                            }
-                            else {
-                                line = item.replace(/URI="(.*)"/,(match,p1) => `URI="${proxy}${m3u8_origin.protocol}//${m3u8_origin.host}${m3u8_origin.pathname.split("/").slice(0,-1).join("/")}/${p1}"`)
-                            }
-                        }
-                        else {
-                            line = item.replace(/URI="(.*)"/,(match,p1) => `URI="${proxy}${p1}"`)
-                        }
-                        m3u8_string = m3u8_string.replace(item,line)
-                    }
-                }
+function normalize_m3u8_playlist(m3u8_string, m3u8_origin, proxy = "") {
+
+    // avoid recursive proxy
+    if (proxy && m3u8_string.includes(proxy)) proxy = ""
+
+    const base_url = `${m3u8_origin.protocol}//${m3u8_origin.host}`
+    const base_path = `${base_url}${m3u8_origin.pathname.split("/").slice(0, -1).join("/")}`
+
+    const lines = m3u8_string.split("\n")
+    const result = []
+
+    for (let line of lines) {
+        if (!line) {
+            result.push(line)
+            continue
+        }
+
+        if (line.startsWith("#")) {
+            if (line.startsWith("#EXT-X-KEY") || line.startsWith("#EXT-X-MAP")) {
+                line = line.replace(/URI="(.*?)"/, (_, uri) => {
+                    if (/^https?:\/\//.test(uri)) return `URI="${proxy}${uri}"`
+                    return uri.startsWith("/") ? `URI="${proxy}${base_url}${uri}"` : `URI="${proxy}${base_path}/${uri}"`
+                })
+            }
+            result.push(line)
+        }
+        else {
+            if (/^https?:\/\//.test(line)) {
+                result.push(`${proxy}${line}`)
             }
             else {
-                // URL
-                m3u8_string = m3u8_string.replace(item,`${proxy}${item}`)
+                const full_url = line.startsWith("/") ? `${base_url}${line}` : `${base_path}/${line}`
+                result.push(`${proxy}${full_url}`)
             }
         }
     }
-    return m3u8_string
+
+    if (!m3u8_string.includes("#EXT-X-PLAYLIST-TYPE")) {
+        result.splice(1, 0, "#EXT-X-PLAYLIST-TYPE:VOD")
+    }
+
+    return result.join("\n")
 }
 
 async function fetch_m3u8_playlist(url,proxy = ""){
