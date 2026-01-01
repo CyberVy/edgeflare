@@ -158,14 +158,17 @@ async function http_forward(request) {
             response.headers.set("Access-Control-Allow-Origin","*")
         }
         response.headers.set("Access-Control-Allow-Credentials","true")
-        if (_response.headers.get("Set-Cookie")){
-            const cookie = _response.headers.get("Set-Cookie")
+        if (response.headers.get("Set-Cookie")){
+            const cookie_list = response.headers.getSetCookie()
+            response.headers.delete("Set-Cookie")
 
-            let new_cookie = cookie.replace(/Domain=[^;]+/gi, "")
-            if (!new_cookie.includes("SameSite=None")) new_cookie += "; SameSite=None"
-            if (!new_cookie.includes("Secure")) new_cookie += "; Secure"
-            new_cookie = new_cookie.replace(/; ;/g,";")
-            response.headers.set("Set-Cookie", new_cookie)
+            for (const cookie of cookie_list){
+                let new_cookie = cookie.replace(/Domain=[^;]+/gi, "").replace(/SameSite=[^;]+/gi, "");
+                new_cookie += "; SameSite=None"
+                if (!new_cookie.includes("Secure")) new_cookie += "; Secure"
+                new_cookie = new_cookie.replace(/;[\s;]*/g, "; ").trim()
+                response.headers.append("Set-Cookie", new_cookie)
+            }
         }
         response.headers.delete("X-Frame-Options")
         response.headers.delete("Content-Length")
